@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html class="h-full">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Green Flags Data Visualization</title>
+  <link href="./dist/output.css" rel="stylesheet">
+</head>
+
+<body class="h-full p-2">
+  <div class="flex flex-col h-full">
+    <div class="flex flex-row justify-between">
+      <h1 class="text-3xl font-medium">Algae Level Graph</h1>
+      <div class="flex align-middle justify-center">
+        <button id="refresh-ports-button" title="refresh">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+            stroke="currentColor" class="w-6 h-6">
+            <path stroke-linecap="round" stroke-linejoin="round"
+              d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
+          </svg>
+        </button>
+        <select id="port-selector" style="cursor: pointer;" class="text-xl rounded px-2 ml-2">
+          <option value="" disabled selected>No Arduino</option>
+        </select>
+      </div>
+    </div>
+    <div class="flex flex-row">
+      <div class="grow" id="sensor-1-data"
+        style="margin: 1rem; padding: .25rem; border-radius: 1rem; border: solid .25rem #6ba3ea; background-color: #b4d0f5; cursor: pointer;">
+        <div class="flex justify-center">
+          <h1 class="text-xl font-medium ml-auto" style="font-weight: 700; letter-spacing: .125rem;">
+            Sensor 1
+          </h1>
+        </div>
+        <div class="flex flex-row" style="justify-content: space-around">
+          <div class="flex flex-col">
+            <span class="flex justify-center" style="font-weight: 700;">Voltage</span> <span
+              class="flex flex-row justify-center" style="gap: .25rem"><span id="voltage-1">0.000</span>
+              V</span>
+          </div>
+          <div class="flex flex-col">
+            <span class="flex justify-center" style="font-weight: 700;">Average (100s)</span> <span
+              class="flex flex-row justify-center" style="gap: .25rem"><span id="avg-voltage-1">0.000</span>
+              V</span>
+          </div>
+        </div>
+      </div>
+      <div class="grow" id="sensor-2-data"
+        style="margin: 1rem; border-radius: 1rem; padding: .25rem; border: solid .25rem #dd6281; background-color: #eeb0c0; cursor: pointer;">
+        <div class="flex justify-center">
+          <h1 class="text-xl font-medium ml-auto" style="font-weight: 700; letter-spacing: .125rem;">
+            Sensor 2
+          </h1>
+        </div>
+        <div class=" flex flex-row" style="justify-content: space-around">
+          <div class="flex flex-col">
+            <span class="flex justify-center" style="font-weight: 700;">Voltage</span> <span
+              class="flex flex-row justify-center" style="gap: .25rem"><span id="voltage-2">0.000</span>V</span>
+          </div>
+          <div class="flex flex-col">
+            <span class="flex justify-center" style="font-weight: 700;">Average (100s)</span> <span
+              class="flex flex-row justify-center" style="gap: .25rem"><span id="avg-voltage-2">0.000</span> V</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="grow" style="width: 100%; max-height: calc(100% - 160px);">
+      <canvas id="v-over-time-chart"></canvas>
+    </div>
+  </div>
+</body>
+
+<script type="module" src="./src/renderer.js"></script>
+
+</html>
