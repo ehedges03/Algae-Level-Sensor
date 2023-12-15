@@ -9,8 +9,10 @@ let mainWindow;
 function createWindow() {
   // Create the browser window.
   mainWindow = new BrowserWindow({
+    autoHideMenuBar: true,
     width: 800,
     height: 600,
+    // frame: false,
     // backgroundColor: "#ccc",
     webPreferences: {
       nodeIntegration: true, // to allow require
@@ -20,6 +22,7 @@ function createWindow() {
   });
 
   // mainWindow.setMenu(null);
+  // mainWindow.removeMenu();
 
   // and load the index.html of the app.
   mainWindow.loadURL(

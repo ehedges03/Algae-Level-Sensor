@@ -8,12 +8,22 @@ const { ReadlineParser } = require("@serialport/parser-readline");
 
 let chart = null;
 let portRefreshTimeout = null;
+let connectedPort = null;
 const portSelector = document.getElementById("port-selector");
 const vOverTimeChart = document.getElementById("v-over-time-chart");
 const refreshPortsButton = document.getElementById("refresh-ports-button");
 const sensor1DataContainer = document.getElementById("sensor-1-data");
 const sensor2DataContainer = document.getElementById("sensor-2-data");
 const COUNT = 250;
+
+window.addEventListener("keydown", (e) => {
+  if (["c", "C"].includes(e.key)) {
+    if (chart) {
+      chart.data.datasets[0].data = new Array(COUNT).fill(0);
+      chart.data.datasets[1].data = new Array(COUNT).fill(0);
+    }
+  }
+});
 
 sensor1DataContainer.addEventListener("click", () => {
   if (!chart) return;
@@ -66,7 +76,7 @@ const sensor2 = new Array(COUNT).fill(0);
 let avg2 = 0;
 let sense2 = 0;
 
-(async function () {
+async function createChart() {
   chart = new Chart(vOverTimeChart, {
     type: "line",
     options: {
@@ -143,7 +153,7 @@ let sense2 = 0;
     chart.data.datasets[1].data.shift();
     chart.update();
   }, 1000);
-})();
+}
 
 function updatePortSelector() {
   spinRefreshButton();
@@ -175,30 +185,48 @@ function updatePortSelector() {
   });
 }
 
-function stopPort() {
+function closePort() {
+  sense1 = 0;
+  sense2 = 0;
+
   if (port) {
     port.close();
+    connectedPort = null;
     port = null;
     parser = null;
   }
 }
 
 function openPort(path) {
-  stopPort();
-  port = new SerialPort({ path, baudRate: 9600 });
-  parser = port.pipe(new ReadlineParser({ delimiter: "\r\n" }));
+  if (connectedPort === path) return;
+  try {
+    closePort();
+    port = new SerialPort({ path, baudRate: 9600 });
+    console.log(port);
+    parser = port.pipe(new ReadlineParser({ delimiter: "\r\n" }));
 
-  parser.on("data", (data) => {
-    console.log(data);
-    clearTimeout(portRefreshTimeout);
+    port.on("error", (e) => {
+      console.error(e);
+      closePort();
+      portRefreshTimeout = setTimeout(updatePortSelector, 1000);
+    });
+
+    parser.on("data", (data) => {
+      console.log(data);
+      clearTimeout(portRefreshTimeout);
+      portRefreshTimeout = setTimeout(updatePortSelector, 1000);
+      let value = data.split(",").map((v) => Number(v));
+      if (value.length !== 2) return;
+      sense1 = value[0];
+      document.getElementById("voltage-1").innerText = sense1.toFixed(3);
+      sense2 = value[1];
+      document.getElementById("voltage-2").innerText = sense2.toFixed(3);
+    });
+  } catch (e) {
+    console.error(e);
+    closePort();
     portRefreshTimeout = setTimeout(updatePortSelector, 1000);
-    let value = data.split(",").map((v) => Number(v));
-    if (value.length !== 2) return;
-    sense1 = value[0];
-    document.getElementById("voltage-1").innerText = sense1.toFixed(3);
-    sense2 = value[1];
-    document.getElementById("voltage-2").innerText = sense2.toFixed(3);
-  });
+  }
 }
 
 function spinRefreshButton() {
@@ -209,3 +237,4 @@ function spinRefreshButton() {
 }
 
 updatePortSelector();
+createChart();
